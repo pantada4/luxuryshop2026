@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Resale Local - Luxury Marketplace</title>
+    <link rel="stylesheet" href="styles-luxury.css">
+<style>
+    /* Luxury look and responsive layout */
+    :root{--bg:#0f0f10;--card:#121214;--accent:#c9a14a;--muted:#bfbfbf}
+    body{margin:0;font-family:Segoe UI, Roboto, Arial, sans-serif;background-color:#0b1b2b;background-image:radial-gradient(circle at 8% 12%, rgba(201,161,74,0.06) 0%, rgba(201,161,74,0.02) 6%, transparent 8%), linear-gradient(180deg,#071326 0%, #081223 100%), repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0 1px, transparent 1px 24px);color:#fff}
+    .navbar{backdrop-filter:blur(6px);background:rgba(0,0,0,0.35);padding:18px 24px;border-bottom:1px solid rgba(255,255,255,0.03)}
+    .navbar-container{display:flex;align-items:center;justify-content:space-between;max-width:1200px;margin:0 auto}
+    .logo{font-weight:700;letter-spacing:2px;color:var(--accent);font-size:20px}
+    .nav-menu a{color:var(--muted);margin:0 10px;text-decoration:none}
+    .hamburger{display:none;background:transparent;border:none;color:var(--muted);font-size:22px;padding:8px;border-radius:8px}
+    .nav-actions{display:flex;align-items:center;gap:8px}
+    @media (max-width:800px){
+        .nav-menu{display:none;position:absolute;top:64px;left:0;right:0;background:linear-gradient(#071326,#081223);padding:12px;flex-direction:column;align-items:center}
+        .hamburger{display:inline-block}
+        .nav-actions .cart-icon{display:none}
+    }
+    .hero{padding:80px 20px;text-align:center;background-image:linear-gradient(180deg, rgba(7,19,38,0.6), rgba(8,18,35,0.6)), url('https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=1600');background-size:cover;background-position:center;border-bottom:1px solid rgba(255,255,255,0.04);color:#fff}
+    .hero h1{font-size:48px;margin:0;color:#fff}
+    .hero p{color:var(--muted);margin:12px 0 18px}
+    .cta-btn{background:var(--accent);color:#0b0b0b;border:none;padding:12px 20px;border-radius:6px;font-weight:600;cursor:pointer}
+
+    .gallery-section{max-width:1200px;margin:40px auto;padding:0 16px}
+    .gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .product-card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.03)}
+    .product-image{position:relative;height:260px;overflow:hidden}
+    .product-image img{width:100%;height:100%;object-fit:cover;display:block}
+    .badge{position:absolute;left:12px;top:12px;background:rgba(0,0,0,0.6);padding:6px 8px;border-radius:6px;color:var(--accent);font-weight:700}
+    .product-info{padding:16px}
+    .product-info h3{margin:0 0 8px}
+    .price{color:var(--accent);font-weight:700}
+    .view-btn{margin-top:10px;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--muted);cursor:pointer}
+    .product-meta{display:flex;gap:10px;margin-top:10px;color:var(--muted);font-size:13px;align-items:center}
+    .product-meta .stars{color:#ffd166;font-weight:700}
+    .product-meta .ship{display:inline-flex;gap:6px;align-items:center}
+    .product-meta .sold{color:#ff8fa3;font-weight:700}
+
+    .about-section{max-width:1100px;margin:40px auto;padding:0 16px}
+    .about-grid{display:flex;gap:18px}
+    .about-card{background:var(--card);padding:18px;border-radius:10px;flex:1;text-align:center}
+
+    .footer{padding:28px;text-align:center;color:var(--muted);border-top:1px solid rgba(255,255,255,0.02)}
+
+    /* Modal */
+    .modal{display:none;position:fixed;inset:0;z-index:2000}
+    .modal-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.7)}
+    .modal-content{position:relative;max-width:980px;margin:60px auto;background:transparent}
+    .modal-body{display:flex;gap:20px;padding:18px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.35));border-radius:12px}
+    .modal-body img{width:360px;height:360px;object-fit:cover;border-radius:8px}
+    .modal-details{flex:1;color:var(--muted)}
+    .modal-price{color:var(--accent);font-weight:800}
+    .modal-actions{margin-top:12px;display:flex;gap:10px}
+    .btn-primary{background:var(--accent);border:none;color:#000;padding:10px 14px;border-radius:8px;cursor:pointer}
+    .btn-secondary{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:10px 14px;border-radius:8px;cursor:pointer}
+
+    /* Reviews */
+    .reviews{margin-top:18px;background:rgba(0,0,0,0.25);padding:12px;border-radius:8px}
+    .reviews h4{margin:0 0 8px;color:#fff}
+    .review-list{max-height:120px;overflow:auto;padding:6px}
+    .review-item{padding:8px;border-bottom:1px solid rgba(255,255,255,0.02);color:var(--muted)}
+    .review-form{display:flex;gap:8px;margin-top:8px}
+    .review-form input{flex:1;padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#fff}
+    .review-form button{padding:8px 10px;border-radius:6px;background:var(--accent);border:none;color:#000;cursor:pointer}
+
+    /* Chat widget */
+    .chat-btn{position:fixed;right:18px;bottom:18px;background:var(--accent);color:#0b0b0b;padding:14px;border-radius:50px;z-index:3000;box-shadow:0 8px 30px rgba(0,0,0,0.6);cursor:pointer}
+    .chat-panel{position:fixed;right:18px;bottom:80px;width:340px;max-width:92vw;height:480px;background:linear-gradient(#0b0b0b,#111);border-radius:12px;display:flex;flex-direction:column;overflow:hidden;z-index:3000;border:1px solid rgba(255,255,255,0.03)}
+    .chat-header{padding:12px;background:rgba(255,255,255,0.02);color:var(--muted);font-weight:700}
+    .chat-messages{flex:1;overflow:auto;padding:12px;color:var(--muted)}
+    .chat-input{display:flex;padding:8px;background:rgba(0,0,0,0.04)}
+    .chat-input input{flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#fff}
+    .chat-input button{margin-left:8px;padding:10px;border-radius:8px;background:var(--accent);border:none;color:#000}
+
+    /* Responsive */
+    @media (max-width:900px){.gallery-grid{grid-template-columns:repeat(2,1fr)}.modal-body{flex-direction:column}.modal-body img{width:100%;height:260px}.chat-panel{width:92vw;right:4%;left:4%}}
+    @media (max-width:600px){.gallery-grid{grid-template-columns:1fr}.hero h1{font-size:32px}.navbar-container{padding:0 12px}}
+
+</style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo">THE RESALE LOCAL</div>
+            <div class="nav-menu">
+                <a href="#home" class="nav-link">Home</a>
+                <a href="#shop" class="nav-link">Shop</a>
+                <a href="#about" class="nav-link">About</a>
+                <a href="#contact" class="nav-link">Contact</a>
+                <a href="#" id="loginLink" class="nav-link">Login</a>
+                <a href="#" id="adminLink" class="nav-link">Admin</a>
+            </div>
+            <div class="nav-actions">
+                <button id="mobileLinkBtn" class="btn-secondary" style="margin-right:8px">Open on Mobile</button>
+                <button id="hamburger" class="hamburger" aria-label="Menu">☰</button>
+                <div class="cart-icon">🛍️</div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Curated Luxury</h1>
+            <p>Premium pre-owned items, authenticated & delivered</p>
+            <button class="cta-btn">Explore Collection</button>
+        </div>
+    </section>
+
+    <section class="sale-banner" style="max-width:1200px;margin:12px auto;padding:12px 16px;background:linear-gradient(90deg, rgba(201,161,74,0.08), rgba(255,255,255,0.02));border-radius:8px;display:flex;align-items:center;gap:12px;color:#fff">
+        <div style="font-weight:800;color:var(--accent)">BIG BILLION SALE</div>
+        <div id="saleTimer" style="font-weight:700">Ends in: --:--:--</div>
+        <div style="margin-left:auto;color:var(--muted)">Use code <strong style="color:var(--accent)">BIGBILLION</strong> for 30% off</div>
+    </section>
+
+    <!-- Product Gallery -->
+    <section id="shop" class="gallery-section">
+        <h2>Featured Items</h2>
+        <div class="gallery-grid">
+            <!-- Product 1 -->
+            <div class="product-card" data-product="bag">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400&h=400&fit=crop" alt="Leather Handbag">
+                    <span class="badge">LUXURY</span>
+                </div>
+                <div class="product-info">
+                    <h3>Premium Leather Handbag</h3>
+                    <p class="price">$180</p>
+                    <p class="condition">Excellent • Authentic</p>
+                    <button class="view-btn">View Details</button>
+                </div>
+            </div>
+
+            <!-- Product 2 -->
+            <div class="product-card" data-product="watch">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1523170335684-f042f1f7a6db?w=400&h=400&fit=crop" alt="Luxury Watch">
+                    <span class="badge">VINTAGE</span>
+                </div>
+                <div class="product-info">
+                    <h3>Vintage Luxury Watch</h3>
+                    <p class="price">$320</p>
+                    <p class="condition">Like New • Certified</p>
+                    <button class="view-btn">View Details</button>
+                </div>
+            </div>
+
+            <!-- Product 3 -->
+            <div class="product-card" data-product="phone">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1511707267537-b85faf00021e?w=400&h=400&fit=crop" alt="Premium Smartphone">
+                    <span class="badge">TECH</span>
+                </div>
+                <div class="product-info">
+                    <h3>Premium Smartphone</h3>
+                    <p class="price">$420</p>
+                    <p class="condition">Minor Wear • Full Box</p>
+                    <button class="view-btn">View Details</button>
+                </div>
+            </div>
+
+            <!-- Product 4 -->
+            <div class="product-card" data-product="glasses">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=400&fit=crop" alt="Designer Glasses">
+                    <span class="badge">DESIGNER</span>
+                </div>
+                <div class="product-info">
+                    <h3>Designer Eyewear</h3>
+                    <p class="price">$95</p>
+                    <p class="condition">Perfect • Original Case</p>
+                    <button class="view-btn">View Details</button>
+                </div>
+            </div>
+
+            <!-- Product 5 -->
+            <div class="product-card" data-product="shoes">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop" alt="Luxury Sneakers">
+                    <span class="badge">FOOTWEAR</span>
+                </div>
+                <div class="product-info">
+                    <h3>Luxury Sneakers</h3>
+                    <p class="price">$140</p>
+                    <p class="condition">Gently Used • Size 9</p>
+                    <button class="view-btn">View Details</button>
+                </div>
+            </div>
+
+            <!-- Product 6 -->
+            <div class="product-card" data-product="furniture">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=400&fit=crop" alt="Designer Chair">
+                    <span class="badge">FURNITURE</span>
+                </div>
+                <div class="product-info">
+                    <h3>Modern Designer Chair</h3>
+                    <p class="price">$210</p>
+                    <p class="condition">Pristine • Ready to Ship</p>
+                    <button class="view-btn">View Details</button>
+                </div>
+            </div>
+
+            <!-- Product 7 -->
+            <div class="product-card" data-product="handcrafted-belt">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1503341455253-b2e723bb3dbb?w=400&h=400&fit=crop" alt="Handcrafted Belt">
+                    <span class="badge">ACCESSORY</span>
+                </div>
+                <div class="product-info">
+                    <h3>Handcrafted Leather Belt</h3>
+                    <p class="price">$75</p>
+                    <p class="condition">New • Premium Stitch</p>
+                    <button class="view-btn">View Details</button>
+                </div>
+            </div>
+
+            <!-- Product 8 -->
+            <div class="product-card" data-product="silk-scarf">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1503341455254-1c2c3d9e2f7b?w=400&h=400&fit=crop" alt="Silk Scarf">
+                    <span class="badge">STYLE</span>
+                </div>
+                <div class="product-info">
+                    <h3>Pure Silk Scarf</h3>
+                    <p class="price">$95</p>
+                    <p class="condition">New • Hand-rolled Edges</p>
+                    <button class="view-btn">View Details</button>
+                </div>
+            </div>
+
+            <!-- Product 9 -->
+            <div class="product-card" data-product="leather-jacket">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1520975912776-3f6e9ff7f8ef?w=400&h=400&fit=crop" alt="Leather Jacket">
+                    <span class="badge">APPAREL</span>
+                </div>
+                <div class="product-info">
+                    <h3>Classic Leather Jacket</h3>
+                    <p class="price">$260</p>
+                    <p class="condition">Excellent • Size M</p>
+                    <button class="view-btn">View Details</button>
+                </div>
+            </div>
+
+            <!-- Product 10 -->
+            <div class="product-card" data-product="designer-bag-2">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1520975668395-3f9d1d9e6f6a?w=400&h=400&fit=crop" alt="Luxury Tote">
+                    <span class="badge">LUXURY</span>
+                </div>
+                <div class="product-info">
+                    <h3>Luxury Tote Bag</h3>
+                    <p class="price">$220</p>
+                    <p class="condition">Like New • Authentic</p>
+                    <button class="view-btn">View Details</button>
+                </div>
+            </div>
+
+            <!-- Product 11 -->
+            <div class="product-card" data-product="sneaker-limited">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1519741491658-8f0b18f0c1b2?w=400&h=400&fit=crop" alt="Limited Sneakers">
+                    <span class="badge">LIMITED</span>
+                </div>
+                <div class="product-info">
+                    <h3>Limited Edition Sneakers</h3>
+                    <p class="price">$350</p>
+                    <p class="condition">New • Size 10</p>
+                    <button class="view-btn">View Details</button>
+                </div>
+            </div>
+
+            <!-- Product 12 -->
+            <div class="product-card" data-product="vase-collector">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1505842465776-3d3a8fa8b9d5?w=400&h=400&fit=crop" alt="Collector Vase">
+                    <span class="badge">COLLECTIBLE</span>
+                </div>
+                <div class="product-info">
+                    <h3>Collector Ceramic Vase</h3>
+                    <p class="price">$480</p>
+                    <p class="condition">Rare • Excellent</p>
+                    <button class="view-btn">View Details</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about-section">
+        <h2>Why Choose Us?</h2>
+        <div class="about-grid">
+            <div class="about-card">
+                <div class="about-icon">✓</div>
+                <h3>Authenticated</h3>
+                <p>Every item verified & guaranteed authentic</p>
+            </div>
+            <div class="about-card">
+                <div class="about-icon">🚚</div>
+                <h3>Fast Shipping</h3>
+                <p>Secure packaging & trackable delivery</p>
+            </div>
+            <div class="about-card">
+                <div class="about-icon">💳</div>
+                <h3>Secure Checkout</h3>
+                <p>Safe payment & buyer protection</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 The Resale Local. All rights reserved.</p>
+        <p>Luxury reimagined. Sustainably.</p>
+    </footer>
+
+    <!-- Modal -->
+    <div id="productModal" class="modal">
+        <div class="modal-overlay" data-close></div>
+        <div class="modal-content">
+            <button class="modal-close" data-close>&times;</button>
+            <div class="modal-body">
+                <img id="modalImage" src="" alt="Product">
+                <div class="modal-details">
+                    <h2 id="modalTitle"></h2>
+                    <p id="modalPrice" class="modal-price"></p>
+                    <p id="modalCondition" class="modal-condition"></p>
+                    <p id="modalDesc" class="modal-desc"></p>
+                    <div class="modal-specs" id="modalSpecs"></div>
+                    <div class="modal-actions">
+                        <button class="btn-primary" id="payNow">Buy Now</button>
+                        <button class="btn-secondary" id="messageSeller">Message Seller</button>
+                    </div>
+
+                    <!-- Shipping & Location Section -->
+                    <div id="shippingSection" style="margin-top:12px;background:rgba(0,0,0,0.25);padding:12px;border-radius:8px">
+                        <h4 style="margin:0 0 8px;color:#fff">Shipping & Location</h4>
+                        <div style="color:var(--muted);font-size:13px">
+                            <div style="margin:8px 0">
+                                <label>Shipping Address:</label>
+                                <input id="shippingAddressInput" placeholder="Enter your address..." style="width:100%;padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#fff;margin-top:4px">
+                            </div>
+                            <button id="useMyLocation" class="btn-secondary" style="width:100%;margin-top:8px">📍 Use My Current Location</button>
+                            <div id="locationDisplay" style="margin-top:8px;padding:8px;background:rgba(255,255,255,0.02);border-radius:6px;display:none">
+                                <p id="locationText" style="margin:0;word-break:break-all"></p>
+                                <button id="clearLocation" class="btn-secondary" style="width:100%;margin-top:6px;padding:4px">Clear</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reviews -->
+                    <div class="reviews" id="reviewsSection">
+                        <h4>Customer Reviews</h4>
+                        <div class="review-list" id="reviewList"></div>
+                        <div class="review-form">
+                            <input id="reviewInput" placeholder="Write a quick review..." aria-label="Write review">
+                            <button id="submitReview">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-overlay" data-close></div>
+        <div class="modal-content">
+            <button class="modal-close" data-close>&times;</button>
+            <div class="modal-body" style="max-width:520px;margin:0 auto;flex-direction:column">
+                <h3 style="margin:0 0 12px">Account</h3>
+                <input id="loginEmail" placeholder="Email" style="padding:10px;margin:6px 0;border-radius:6px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#fff">
+                <input id="loginPassword" placeholder="Password" type="password" style="padding:10px;margin:6px 0;border-radius:6px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#fff">
+                <div style="display:flex;gap:8px;margin-top:8px">
+                    <button id="btnLogin" class="btn-primary">Login</button>
+                    <button id="btnRegister" class="btn-secondary">Register</button>
+                    <button class="btn-secondary" data-close style="margin-left:auto">Close</button>
+                </div>
+                <div id="accountInfo" style="margin-top:10px;color:var(--muted)"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Link Modal -->
+    <div id="mobileLinkModal" class="modal">
+        <div class="modal-overlay" data-close></div>
+        <div class="modal-content">
+            <button class="modal-close" data-close>&times;</button>
+            <div class="modal-body" style="max-width:420px;margin:0 auto;flex-direction:column">
+                <h3 style="margin:0 0 8px">Open on Mobile</h3>
+                <p id="mobileLinkText" style="word-break:break-all;color:var(--muted)"></p>
+                <img id="mobileLinkQR" src="" alt="QR" style="width:160px;height:160px;margin:8px 0;border-radius:8px;background:#fff" />
+                <div style="display:flex;gap:8px">
+                    <button id="copyMobileLink" class="btn-primary">Copy Link</button>
+                    <button id="shareMobileLink" class="btn-secondary">Share</button>
+                    <button class="btn-secondary" data-close>Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script-luxury.js" defer></script>
+
+    <script>
+    // Lightweight product modal, reviews, payment simulation and chat widget
+    (function(){
+        // Store current location
+        let currentLocation = null;
+
+        // Modal basics
+        const modal = document.getElementById('productModal');
+        const closeBtns = modal.querySelectorAll('[data-close]');
+        closeBtns.forEach(b=>b.addEventListener('click', ()=> modal.style.display='none'));
+
+        document.querySelectorAll('.view-btn').forEach(btn=>{
+            btn.addEventListener('click', (e)=>{
+                const card = e.target.closest('.product-card');
+                const title = card.querySelector('h3').innerText;
+                const price = card.querySelector('.price').innerText;
+                const img = card.querySelector('img').src;
+                const condition = card.querySelector('.condition').innerText;
+                modal.style.display = 'block';
+                document.getElementById('modalTitle').innerText = title;
+                document.getElementById('modalPrice').innerText = price;
+                document.getElementById('modalCondition').innerText = condition;
+                document.getElementById('modalImage').src = img;
+                // load reviews for product key
+                const key = card.dataset.product || title;
+                loadReviews(key);
+                // attach pay action
+                const payNow = document.getElementById('payNow');
+                payNow.onclick = ()=>simulatePayment(title, price);
+                // reset location display
+                currentLocation = null;
+                document.getElementById('locationDisplay').style.display = 'none';
+                document.getElementById('shippingAddressInput').value = '';
+            })
+        })
+
+        // Location features
+        document.getElementById('useMyLocation').addEventListener('click', async ()=>{
+            const btn = document.getElementById('useMyLocation');
+            btn.disabled = true;
+            btn.innerText = '📍 Getting location...';
+            try{
+                currentLocation = await new Promise((resolve, reject)=>{
+                    if(navigator.geolocation){
+                        navigator.geolocation.getCurrentPosition(pos=>{
+                            resolve({lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: Math.round(pos.coords.accuracy)});
+                        }, err=>reject(err), {enableHighAccuracy: true, timeout: 10000, maximumAge: 0});
+                    } else {
+                        reject(new Error('Geolocation not supported'));
+                    }
+                });
+                const locText = `📍 Latitude: ${currentLocation.lat.toFixed(6)}\n📍 Longitude: ${currentLocation.lng.toFixed(6)}\n🎯 Accuracy: ${currentLocation.accuracy}m`;
+                document.getElementById('locationText').innerText = locText;
+                document.getElementById('locationDisplay').style.display = 'block';
+                btn.disabled = false;
+                btn.innerText = '📍 Use My Current Location';
+            }catch(err){
+                alert('Location access denied or unavailable: '+err.message);
+                btn.disabled = false;
+                btn.innerText = '📍 Use My Current Location';
+            }
+        });
+
+        document.getElementById('clearLocation').addEventListener('click', ()=>{
+            currentLocation = null;
+            document.getElementById('locationDisplay').style.display = 'none';
+            document.getElementById('shippingAddressInput').value = '';
+        });
+
+        // Reviews stored in localStorage per product
+        function loadReviews(key){
+            const list = document.getElementById('reviewList');
+            list.innerHTML='';
+            const reviews = JSON.parse(localStorage.getItem('reviews||'+key) || '[]');
+            if(reviews.length===0){ list.innerHTML='<div class="review-item">No reviews yet.</div>'; return }
+            reviews.slice().reverse().forEach(r=>{
+                const d = document.createElement('div'); d.className='review-item'; d.innerText = r;
+                list.appendChild(d);
+            })
+        }
+        document.getElementById('submitReview').addEventListener('click', ()=>{
+            const text = document.getElementById('reviewInput').value.trim();
+            if(!text) return;
+            // determine current product by modal title
+            const key = document.getElementById('modalTitle').innerText || 'global';
+            const reviews = JSON.parse(localStorage.getItem('reviews||'+key) || '[]');
+            reviews.push(text);
+            localStorage.setItem('reviews||'+key, JSON.stringify(reviews));
+            document.getElementById('reviewInput').value='';
+            loadReviews(key);
+        })
+
+        function simulatePayment(title, price){
+            // Simulated payment flow for demo — replace with Stripe/PayPal server flow in production
+            const confirmText = `Confirm purchase of ${title} for ${price}?`;
+            if(!confirm(confirmText)) return;
+            const btn = document.getElementById('payNow'); btn.disabled=true; btn.innerText='Processing...';
+            setTimeout(()=>{ btn.disabled=false; btn.innerText='Buy Now'; alert('Payment successful — thank you!'); modal.style.display='none'; }, 1400);
+        }
+
+        // Simple chat widget that can be connected to an AI API by adding a server endpoint.
+        function createChatWidget(){
+            const chatBtn = document.createElement('button'); chatBtn.className='chat-btn'; chatBtn.innerText='Chat';
+            document.body.appendChild(chatBtn);
+            const panel = document.createElement('div'); panel.className='chat-panel'; panel.style.display='none';
+            panel.innerHTML = `<div class="chat-header">Support</div><div class="chat-messages" id="chatMessages"></div><div class="chat-input"><input id="chatInput" placeholder="Ask for help..."><button id="chatSend">Send</button></div>`;
+            document.body.appendChild(panel);
+            chatBtn.addEventListener('click', ()=>{ panel.style.display = panel.style.display==='none'?'flex':'none'; });
+            panel.querySelector('#chatSend').addEventListener('click', sendChat);
+            panel.querySelector('#chatInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter') sendChat(); });
+
+            function appendMessage(role,text){ const el=document.getElementById('chatMessages'); const p=document.createElement('div'); p.style.margin='8px 0'; p.innerText=(role==='user'? 'You: ':'Bot: ')+text; el.appendChild(p); el.scrollTop = el.scrollHeight; }
+
+            async function sendChat(){
+                const input = panel.querySelector('#chatInput'); const text = input.value.trim(); if(!text) return; appendMessage('user', text); input.value='';
+                appendMessage('bot','Thinking...');
+                // Try to call a configured serverless endpoint or OpenAI key stored in localStorage
+                const openaiKey = localStorage.getItem('OPENAI_API_KEY');
+                if(openaiKey){
+                    // Example fetch (requires CORS/server proxy). Replace /chat-proxy with your server.
+                    try{
+                        const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+                            method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+openaiKey},
+                            body:JSON.stringify({model:'gpt-3.5-turbo',messages:[{role:'user',content:text}]})
+                        });
+                        const data = await resp.json();
+                        const msg = data?.choices?.[0]?.message?.content || 'Sorry, no reply.';
+                        // remove the 'Thinking...' placeholder
+                        const msgs = document.getElementById('chatMessages'); msgs.lastChild.innerText = 'Bot: '+msg;
+                    }catch(err){ document.getElementById('chatMessages').lastChild.innerText = 'Bot: (error contacting AI)'; }
+                }else{
+                    // Fallback canned responses for offline/demo
+                    setTimeout(()=>{
+                        document.getElementById('chatMessages').lastChild.innerText = 'Bot: Thanks for asking! For billing, shipping, or returns, type specifics and we will assist.';
+                    },700);
+                }
+            }
+        }
+        createChatWidget();
+    })();
+    </script>
+
+    <script>
+    // Extra features: promos, login, admin panel, billing simulation
+    (function(){
+        // ensure admin passcode exists
+        if(!localStorage.getItem('ADMIN_PASSCODE')){
+            localStorage.setItem('ADMIN_PASSCODE','RESALE-ADMIN-2026');
+            alert('Admin passcode created: RESALE-ADMIN-2026 (save it somewhere safe)');
+        }
+        const modal = document.getElementById('productModal');
+        function formatPrice(n){ return '$'+(Number(n).toFixed(2)); }
+
+        // apply stored overrides on load
+        const overrides = JSON.parse(localStorage.getItem('product_overrides')||'{}');
+        Object.keys(overrides).forEach(k=>{
+            const o = overrides[k];
+            const card = document.querySelector(`.product-card[data-product="${k}"]`);
+            if(card){ if(o.title) card.querySelector('h3').innerText=o.title; if(o.price){ card.dataset.price=o.price; card.querySelector('.price').innerText='$'+parseFloat(o.price).toFixed(0); } }
+        });
+
+        // add promo input into modal if missing
+        if(!document.getElementById('promoInputModal')){
+            const promoDiv = document.createElement('div');
+            promoDiv.style.marginTop='12px';
+            promoDiv.innerHTML = '<input id="promoInputModal" placeholder="Promo code" style="padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#fff;margin-right:8px;"> <button id="applyPromoModal" class="btn-secondary" style="padding:8px">Apply</button> <div id="promoInfo" style="color:var(--muted);margin-top:8px"></div>';
+            const reviewsSection = document.getElementById('reviewsSection');
+            if(reviewsSection) reviewsSection.parentNode.insertBefore(promoDiv, reviewsSection);
+        }
+
+        const promoCodes = { 'WELCOME10':10, 'LUX20':20, 'FREESHIP':0, 'BIGBILLION':30 };
+        // Big Billion sale countdown (default 48 hours from first load)
+        if(!localStorage.getItem('SALE_END')){ localStorage.setItem('SALE_END', (Date.now() + 48*3600*1000).toString()); }
+        const saleEnd = new Date(parseInt(localStorage.getItem('SALE_END'),10));
+        function updateSaleTimer(){ const diff = saleEnd - Date.now(); const el = document.getElementById('saleTimer'); if(!el) return; if(diff<=0){ el.innerText='Sale ended'; return; } const hrs = Math.floor(diff/36e5); const mins = Math.floor((diff%36e5)/6e4); const secs = Math.floor((diff%6e4)/1000); el.innerText = `Ends in: ${hrs}h ${mins}m ${secs}s`; }
+        setInterval(updateSaleTimer,1000); updateSaleTimer();
+        let currentPromo = null;
+
+        document.getElementById('applyGlobalPromo').addEventListener('click', ()=>{
+            const code = document.getElementById('promoGlobal').value.trim().toUpperCase();
+            if(!code){ alert('Enter a promo code'); return; }
+            const v = promoCodes[code];
+            if(!v && v!==0){ alert('Invalid promo'); return; }
+            localStorage.setItem('LAST_GLOBAL_PROMO', code);
+            alert('Promo '+code+' applied ('+v+'% off where applicable)');
+        });
+
+        document.getElementById('applyPromoModal').addEventListener('click', ()=>{
+            const code = document.getElementById('promoInputModal').value.trim().toUpperCase();
+            if(!code){ document.getElementById('promoInfo').innerText='Enter a code'; return; }
+            const v = promoCodes[code];
+            if(v===undefined){ document.getElementById('promoInfo').innerText='Invalid code'; currentPromo=null; return; }
+            currentPromo = {code:code,percent:v};
+            document.getElementById('promoInfo').innerText = `${code} applied — ${v}% off`;
+            const base = Number(modal.dataset.basePrice||0);
+            const discounted = base*(1 - v/100);
+            document.getElementById('modalPrice').innerText = formatPrice(discounted);
+        });
+
+        // enhance view buttons to set base price on modal
+        document.querySelectorAll('.view-btn').forEach(btn=>{
+            btn.addEventListener('click', (e)=>{
+                const card = e.target.closest('.product-card');
+                const key = card.dataset.product || card.querySelector('h3').innerText;
+                const price = Number(card.dataset.price || card.querySelector('.price').innerText.replace(/[^0-9.]/g,''));
+                modal.dataset.currentKey = key;
+                modal.dataset.basePrice = price;
+                currentPromo = null;
+                document.getElementById('modalPrice').innerText = formatPrice(price);
+                document.getElementById('promoInputModal').value = '';
+                document.getElementById('promoInfo').innerText = '';
+            });
+        });
+
+        // login handling (email/password via server)
+        const loginLink = document.getElementById('loginLink');
+        function refreshLogin(){ const email = localStorage.getItem('USER_EMAIL'); loginLink.innerText = email? `Account (${email})` : 'Login'; }
+        loginLink.addEventListener('click',(e)=>{ e.preventDefault(); const email = localStorage.getItem('USER_EMAIL'); if(email){ if(confirm('Logout '+email+'?')){ localStorage.removeItem('USER_EMAIL'); localStorage.removeItem('AUTH_TOKEN'); refreshLogin(); alert('Logged out'); } else return; } else { document.getElementById('loginModal').style.display='block'; } });
+        refreshLogin();
+        // login modal actions
+        document.getElementById('btnLogin').addEventListener('click', async ()=>{
+            const email = document.getElementById('loginEmail').value.trim(); const password = document.getElementById('loginPassword').value;
+            if(!email||!password){ alert('Enter email and password'); return; }
+            try{
+                const resp = await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,password:password})});
+                if(!resp.ok){ const j=await resp.json(); alert('Login failed: '+(j.error||resp.status)); return; }
+                const data=await resp.json(); localStorage.setItem('AUTH_TOKEN', data.token); localStorage.setItem('USER_EMAIL', email); document.getElementById('loginModal').style.display='none'; refreshLogin(); alert('Logged in');
+            }catch(err){ alert('Login error'); }
+        });
+        document.getElementById('btnRegister').addEventListener('click', async ()=>{
+            const email = document.getElementById('loginEmail').value.trim(); const password = document.getElementById('loginPassword').value; if(!email||!password){ alert('Enter email and password'); return; }
+            try{
+                const resp = await fetch('/api/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,password:password,name:''})});
+                if(!resp.ok){ const j=await resp.json(); alert('Register failed: '+(j.error||resp.status)); return; }
+                const data=await resp.json(); localStorage.setItem('AUTH_TOKEN', data.token); localStorage.setItem('USER_EMAIL', email); document.getElementById('loginModal').style.display='none'; refreshLogin(); alert('Registered and logged in');
+            }catch(err){ alert('Register error'); }
+        });
+        // close buttons for login modal
+        document.querySelectorAll('#loginModal [data-close]').forEach(b=>b.addEventListener('click', ()=> document.getElementById('loginModal').style.display='none'));
+
+
+        // admin handling
+        document.getElementById('adminLink').addEventListener('click',(e)=>{ e.preventDefault(); const pass = prompt('Enter admin passcode:'); if(!pass) return; if(pass !== localStorage.getItem('ADMIN_PASSCODE')){ alert('Invalid passcode'); return; } openAdminPanel(); });
+
+        function openAdminPanel(){
+            if(document.getElementById('adminPanel')){ document.getElementById('adminPanel').style.display='block'; return; }
+            const panel = document.createElement('div'); panel.id='adminPanel';
+            panel.style.position='fixed'; panel.style.inset='8%'; panel.style.zIndex='4000'; panel.style.background='rgba(10,10,12,0.98)'; panel.style.border='1px solid rgba(255,255,255,0.04)'; panel.style.borderRadius='10px'; panel.style.padding='18px'; panel.style.overflow='auto';
+            panel.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0">Admin Panel</h3><div><button id="closeAdmin" class="btn-secondary">Close</button></div></div><div id="adminProducts"></div><div style="margin-top:12px"><h4>Settings</h4><div>Change admin passcode: <input id="newAdminPass" placeholder="new pass"></div><div style="margin-top:8px">Site host URL: <input id="hostUrl" placeholder="https://your-domain.com/index-luxury.html" style="width:320px"></div><div style="margin-top:8px"><button id="saveAdminPass" class="btn-primary">Save Passcode</button> <button id="saveHostUrl" class="btn-secondary">Save Host URL</button></div></div><div style="margin-top:12px"><h4>Mobile Link</h4><div id="mobileShareInfo" style="color:var(--muted);font-size:12px;background:rgba(255,255,255,0.02);padding:8px;border-radius:6px;word-break:break-all"></div></div><div style="margin-top:12px"><h4>Recent Orders (with Location)</h4><div id="ordersPreview" style="max-height:200px;overflow:auto;color:var(--muted);font-size:11px"></div></div>`;
+            document.body.appendChild(panel);
+            document.getElementById('closeAdmin').addEventListener('click', ()=>panel.style.display='none');
+            const list = document.getElementById('adminProducts');
+            document.querySelectorAll('.product-card').forEach(card=>{
+                const key = card.dataset.product || '';
+                const title = card.querySelector('h3').innerText;
+                const price = card.dataset.price || card.querySelector('.price').innerText.replace(/[^0-9.]/g,'');
+                const row = document.createElement('div'); row.style.display='flex'; row.style.gap='8px'; row.style.alignItems='center'; row.style.margin='8px 0';
+                row.innerHTML = `<div style="width:220px"><input class="adm-title" value="${title}" style="width:100%"></div><div style="width:120px"><input class="adm-price" value="${price}" style="width:100%"></div><div><button class="adm-save btn-primary">Save</button></div><div style="color:var(--muted);margin-left:10px">key: ${key}</div>`;
+                list.appendChild(row);
+                row.querySelector('.adm-save').addEventListener('click', ()=>{
+                    const newTitle = row.querySelector('.adm-title').value;
+                    const newPrice = row.querySelector('.adm-price').value;
+                    const overrides = JSON.parse(localStorage.getItem('product_overrides')||'{}');
+                    overrides[key] = {title:newTitle, price:newPrice};
+                    localStorage.setItem('product_overrides', JSON.stringify(overrides));
+                    // apply to DOM
+                    card.querySelector('h3').innerText = newTitle;
+                    card.dataset.price = newPrice;
+                    card.querySelector('.price').innerText = '$'+parseFloat(newPrice).toFixed(0);
+                    alert('Saved product '+key);
+                });
+            });
+            document.getElementById('saveAdminPass').addEventListener('click', ()=>{
+                const np = document.getElementById('newAdminPass').value.trim(); if(!np) return alert('Enter a new passcode'); localStorage.setItem('ADMIN_PASSCODE', np); alert('Admin passcode updated');
+            });
+            // host url save
+            document.getElementById('hostUrl').value = localStorage.getItem('HOST_URL')||'https://the-resale-local.example.com';
+            document.getElementById('saveHostUrl').addEventListener('click', ()=>{
+                const h = document.getElementById('hostUrl').value.trim(); if(!h) return alert('Enter host URL'); localStorage.setItem('HOST_URL', h); alert('Host URL saved');
+            });
+
+            // Display mobile link info (prefer server-provided LAN host)
+            (async function(){
+                let hostUrl = localStorage.getItem('HOST_URL');
+                if(!hostUrl){
+                    try{ const r = await fetch('/api/hostinfo'); if(r.ok){ const j = await r.json(); hostUrl = j.host; } }catch(e){ /*ignore*/ }
+                }
+                hostUrl = hostUrl || (location.origin + location.pathname);
+                document.getElementById('mobileShareInfo').innerHTML = `<strong>Mobile Shareable Link:</strong><br>${hostUrl}<br><br><strong>QR Code:</strong><br><img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(hostUrl)}" style="width:120px;height:120px;margin-top:8px;border-radius:4px">`;
+            })();
+
+            // Display recent orders with locations
+            const orders = JSON.parse(localStorage.getItem('orders')||'[]');
+            const ordersDiv = document.getElementById('ordersPreview');
+            if(orders.length === 0){
+                ordersDiv.innerHTML = '<div style="color:var(--muted)">No orders yet</div>';
+            } else {
+                ordersDiv.innerHTML = orders.slice(-5).reverse().map((o,i)=>{
+                    const locStr = o.location ? `📍 ${o.location.lat.toFixed(4)}, ${o.location.lng.toFixed(4)}` : '📍 No location';
+                    return `<div style="padding:6px;border-bottom:1px solid rgba(255,255,255,0.05)"><strong>${o.name}</strong> - $${o.amount}<br>${o.shippingAddress}<br>${locStr}<br><small>${new Date(o.timestamp).toLocaleString()}</small></div>`;
+                }).join('');
+            }
+            // create a share button for mobile/whatsapp
+            function createShareWidgetLink(){
+                const shareBtn = document.createElement('button'); shareBtn.className='chat-btn'; shareBtn.id='shareBtn'; shareBtn.style.right='80px'; shareBtn.innerText='Share'; document.body.appendChild(shareBtn);
+                shareBtn.addEventListener('click', ()=>{
+                    const host = localStorage.getItem('HOST_URL')||'https://the-resale-local.example.com';
+                    const text = `Check out The Resale Local — premium pre-owned items. Open here: ${host}`;
+                    if(navigator.share){ navigator.share({title:'The Resale Local', text:text, url:host}).catch(()=>{ window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`); }); }
+                    else{ window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank'); }
+                });
+            }
+            createShareWidgetLink();
+        }
+
+        // filters: top/hot/discounts
+        document.getElementById('filterTop').addEventListener('click', ()=>{
+            const top = ['vase-collector','designer-bag-2','watch']; document.querySelectorAll('.product-card').forEach(c=>{ c.style.opacity = 0.3; c.style.boxShadow='none'; }); top.forEach(k=>{ const el = document.querySelector(`.product-card[data-product="${k}"]`); if(el){ el.style.opacity=1; el.style.boxShadow='0 12px 30px rgba(201,161,74,0.15)'; } });
+        });
+        document.getElementById('filterHot').addEventListener('click', ()=>{
+            const hot = ['sneaker-limited','designer-bag-2','bag']; document.querySelectorAll('.product-card').forEach(c=>{ c.style.opacity = 0.3; c.style.boxShadow='none'; }); hot.forEach(k=>{ const el = document.querySelector(`.product-card[data-product="${k}"]`); if(el){ el.style.opacity=1; el.style.boxShadow='0 12px 30px rgba(255,100,50,0.12)'; } });
+        });
+        document.getElementById('filterDiscounts').addEventListener('click', ()=>{
+            const discounts = ['silk-scarf','handcrafted-belt','glasses']; document.querySelectorAll('.product-card').forEach(c=>{ c.style.opacity = 0.3; c.style.boxShadow='none'; }); discounts.forEach(k=>{ const el = document.querySelector(`.product-card[data-product="${k}"]`); if(el){ el.style.opacity=1; el.style.boxShadow='0 12px 30px rgba(50,200,150,0.08)'; } });
+        });
+
+        // Function to get user location
+        async function getUserLocation(){
+            return new Promise((resolve, reject)=>{
+                if(navigator.geolocation){
+                    navigator.geolocation.getCurrentPosition(pos=>{
+                        resolve({lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy});
+                    }, err=>{
+                        reject(err);
+                    });
+                } else {
+                    reject(new Error('Geolocation not supported'));
+                }
+            });
+        }
+
+        // enhance Buy Now flow
+        document.getElementById('payNow').addEventListener('click', async ()=>{
+            const user = localStorage.getItem('USER_NAME');
+            if(!user){ if(!confirm('You are not logged in. Create a free account?')) return; const name = prompt('Enter your name for a free account:'); if(!name) return; localStorage.setItem('USER_NAME', name); alert('Account created (free)'); }
+            const name = localStorage.getItem('USER_NAME');
+            const base = Number(modal.dataset.basePrice||0);
+            const percent = currentPromo? currentPromo.percent:0;
+            const final = +(base*(1 - percent/100)).toFixed(2);
+            const billingName = prompt('Billing name:', name) || name;
+            const billingEmail = prompt('Billing email: (demo)') || '';
+            
+            // Get shipping address
+            let shippingAddr = document.getElementById('shippingAddressInput').value.trim();
+            if(!shippingAddr){ shippingAddr = prompt('Enter shipping address:'); }
+            if(!shippingAddr){ alert('Shipping address required'); return; }
+
+            // Use collected location or prompt for new one
+            let location = currentLocation;
+            if(!location){
+                try{
+                    location = await getUserLocation();
+                } catch(err){
+                    console.log('Location access denied or unavailable');
+                }
+            }
+
+            const payload = { product: modal.dataset.currentKey||'unknown', amount: final, name: billingName, email: billingEmail, shippingAddress: shippingAddr, location: location, timestamp: new Date().toISOString() };
+            
+            // try server order first
+            try{
+                const headers = {'Content-Type':'application/json'}; const token = localStorage.getItem('AUTH_TOKEN'); if(token) headers['Authorization'] = 'Bearer '+token; const resp = await fetch('/api/orders', { method: 'POST', headers: headers, body: JSON.stringify(payload) });
+                if(resp.ok){ const data = await resp.json(); alert('Order placed (id:'+data.order_id+'). Shipping to: '+shippingAddr); modal.style.display='none'; return; }
+                throw new Error('server error');
+            }catch(err){
+                // fallback to localStorage demo
+                const orders = JSON.parse(localStorage.getItem('orders')||'[]');
+                orders.push(payload);
+                localStorage.setItem('orders', JSON.stringify(orders));
+                const locInfo = location ? `\nLocation: ${location.lat.toFixed(4)}, ${location.lng.toFixed(4)} (Accuracy: ${location.accuracy}m)` : '\nLocation: Not provided';
+                alert(`✅ Order Confirmed!\nName: ${billingName}\nShipping to: ${shippingAddr}\nAmount: $${final}${locInfo}`);
+                modal.style.display='none';
+            }
+        });
+    })();
+    </script>
+
+    <script>
+    (function(){
+        // Inject richer product meta and add extra inventory images
+        const modal = document.getElementById('productModal');
+        document.querySelectorAll('.product-card').forEach((card,i)=>{
+            if(card.querySelector('.product-meta')) return;
+            const rating = (4 + (i%2)*0.5).toFixed(1);
+            const sold = 20 + i*7;
+            const meta = document.createElement('div'); meta.className='product-meta';
+            meta.innerHTML = `<div class="stars">★ ${rating}</div><div class="ship">🚚 Ships in 2-4 days</div><div class="sold">🔥 ${sold} sold</div>`;
+            card.querySelector('.product-info').appendChild(meta);
+        });
+
+        // Append extra product cards (phone-related) if not already present
+        const grid = document.querySelector('.gallery-grid');
+        if(grid && grid.querySelectorAll('.product-card').length < 16){
+            const extras = [
+                {k:'phone-case',img:'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800',title:'Premium Phone Case',price:35,badge:'ACCESSORY',cond:'New'},
+                {k:'wireless-earbuds',img:'https://images.unsplash.com/photo-1585386959984-a4155229f7c8?w=800',title:'Wireless Earbuds',price:120,badge:'TECH',cond:'Like New'},
+                {k:'tablet',img:'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800',title:'Luxury Tablet 11"',price:650,badge:'TECH',cond:'Open Box'},
+                {k:'camera',img:'https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d?w=800',title:'Classic Film Camera',price:290,badge:'COLLECTIBLE',cond:'Excellent'}
+            ];
+            extras.forEach(e=>{
+                const div = document.createElement('div'); div.className='product-card'; div.dataset.product=e.k; div.dataset.price=e.price;
+                div.innerHTML = `<div class="product-image"><img src="${e.img}" alt="${e.title}"><span class="badge">${e.badge}</span></div><div class="product-info"><h3>${e.title}</h3><p class="price">$${e.price}</p><p class="condition">${e.cond}</p><button class="view-btn">View Details</button></div>`;
+                grid.appendChild(div);
+                // add meta
+                const rating = (4.5).toFixed(1); const sold = 12;
+                const meta = document.createElement('div'); meta.className='product-meta'; meta.innerHTML = `<div class="stars">★ ${rating}</div><div class="ship">🚚 Ships in 2-4 days</div><div class="sold">🔥 ${sold} sold</div>`;
+                div.querySelector('.product-info').appendChild(meta);
+            });
+        }
+
+        // Bind view button behavior for newly added items
+        document.querySelectorAll('.view-btn').forEach(btn=>{
+            if(btn.dataset.bound) return; btn.dataset.bound = '1';
+            btn.addEventListener('click', (e)=>{
+                const card = e.target.closest('.product-card');
+                const title = card.querySelector('h3').innerText;
+                const price = card.querySelector('.price').innerText;
+                const img = card.querySelector('img').src;
+                const condition = card.querySelector('.condition').innerText;
+                modal.style.display = 'block';
+                document.getElementById('modalTitle').innerText = title;
+                document.getElementById('modalPrice').innerText = price;
+                document.getElementById('modalCondition').innerText = condition;
+                document.getElementById('modalImage').src = img;
+                const key = card.dataset.product || title;
+                modal.dataset.currentKey = key;
+                modal.dataset.basePrice = card.dataset.price || price.replace(/[^0-9.]/g,'');
+                if(typeof loadReviews === 'function') loadReviews(key);
+                const payNow = document.getElementById('payNow');
+                payNow.onclick = ()=>simulatePayment(title, price);
+            });
+        });
+    })();
+    </script>
+<script>
+// Mobile menu and direct link handlers
+(function(){
+    const hamburger = document.getElementById('hamburger');
+    const navMenu = document.querySelector('.nav-menu');
+    if(hamburger){ hamburger.addEventListener('click', ()=>{ if(navMenu.style.display==='flex'){ navMenu.style.display='none'; } else { navMenu.style.display='flex'; } }); }
+
+    const mobileBtn = document.getElementById('mobileLinkBtn');
+    const mobileModal = document.getElementById('mobileLinkModal');
+    const mobileText = document.getElementById('mobileLinkText');
+    const mobileQR = document.getElementById('mobileLinkQR');
+    const copyBtn = document.getElementById('copyMobileLink');
+    const shareBtn = document.getElementById('shareMobileLink');
+
+    async function getHostUrl(){
+        const stored = localStorage.getItem('HOST_URL');
+        if(stored) return stored;
+        // Prefer a public tunnel if backend started one
+        try{
+            const t = await fetch('/api/tunnel');
+            if(t.ok){ const tj = await t.json(); if(tj && tj.tunnel) return tj.tunnel; }
+        }catch(e){/*ignore*/}
+        try{
+            const resp = await fetch('/api/hostinfo');
+            if(resp.ok){ const j = await resp.json(); if(j && j.host) return j.host; if(j && j.lan_ip) return 'http://'+j.lan_ip+':'+(j.port||location.port)+location.pathname; }
+        }catch(e){/*ignore*/}
+        return location.origin + location.pathname;
+    }
+
+    if(mobileBtn){
+        mobileBtn.addEventListener('click', async ()=>{
+            const url = await getHostUrl();
+            mobileText.innerText = url;
+            mobileQR.src = 'https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=' + encodeURIComponent(url);
+            mobileModal.style.display = 'block';
+        });
+    }
+    if(copyBtn){ copyBtn.addEventListener('click', async ()=>{ try{ await navigator.clipboard.writeText(mobileText.innerText); alert('Link copied to clipboard'); }catch(e){ alert('Copy failed'); } }); }
+    if(shareBtn){ shareBtn.addEventListener('click', ()=>{ const url = mobileText.innerText; if(navigator.share){ navigator.share({title:'The Resale Local', text:'Open our shop', url:url}).catch(()=>{ window.open('https://api.whatsapp.com/send?text='+encodeURIComponent(url)); }); } else { window.open('https://api.whatsapp.com/send?text='+encodeURIComponent(url),'_blank'); } }); }
+
+    // Close modal handlers
+    document.querySelectorAll('#mobileLinkModal [data-close]').forEach(b=>b.addEventListener('click', ()=> document.getElementById('mobileLinkModal').style.display='none'));
+
+    // Improve touch targets and spacing for small screens
+    const style = document.createElement('style'); style.innerText = '@media (max-width:600px){ .hero{padding:40px 12px} .product-image{height:220px} .product-info{padding:14px} .view-btn{padding:12px 16px;font-size:16px} .btn-primary, .btn-secondary{padding:12px 14px;font-size:15px} .nav-menu a{padding:10px 0;display:block} }'; document.head.appendChild(style);
+})();
+</script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Elite Luxury Mall</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background-color: #050505; color: white; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .app-shell { padding-bottom: 80px; }
+        .luxury-card { background: #111; border: 1px solid #222; border-radius: 24px; overflow: hidden; }
+        /* Clean scroll for categories */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="app-shell">
+
+    <header class="p-6 pb-2 flex justify-between items-center sticky top-0 bg-black/80 backdrop-blur-md z-50">
+        <div>
+            <p class="text-gray-500 text-[10px] font-bold tracking-[3px] uppercase">Summer 2026</p>
+            <h1 class="text-2xl font-black italic">ELITE.</h1>
+        </div>
+        <div class="bg-blue-600 h-10 w-10 rounded-full flex items-center justify-center shadow-lg shadow-blue-500/20">
+            <i class="fa-solid fa-user text-xs"></i>
+        </div>
+    </header>
+
+    <div class="flex overflow-x-auto no-scrollbar p-6 space-x-8">
+        <div class="flex flex-col items-center min-w-[60px]">
+            <div class="h-14 w-14 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10"><i class="fa-solid fa-mobile-screen text-blue-500"></i></div>
+            <span class="text-[9px] mt-2 font-bold text-gray-400">PHONES</span>
+        </div>
+        </div>
+
+    <main class="px-6 space-y-6">
+        <div class="luxury-card p-4">
+            <img src="https://images.unsplash.com/photo-1616348436168-de43ad0db179?w=800" class="w-full h-72 object-contain rounded-2xl mb-4">
+            <h2 class="text-lg font-bold">Ultra Vision Pro</h2>
+            <p class="text-gray-500 text-xs mb-4">Experience the future of titanium tech.</p>
+            <div class="flex justify-between items-center">
+                <span class="text-xl font-black">$1,299</span>
+                <button class="bg-white text-black px-6 py-2 rounded-full font-bold text-xs uppercase">Order</button>
+            </div>
+        </div>
+    </main>
+
+    <nav class="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-xl border-t border-white/5 flex justify-around py-5 z-50">
+        <i class="fa-solid fa-house text-white text-lg"></i>
+        <i class="fa-solid fa-magnifying-glass text-gray-600 text-lg"></i>
+        <i class="fa-solid fa-cart-shopping text-gray-600 text-lg"></i>
+        <i class="fa-solid fa-gear text-gray-600 text-lg"></i>
+    </nav>
+
+</body>
+</html>
